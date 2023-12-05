@@ -69,7 +69,7 @@ nav ul li {
 }
 
 .box:hover {
-  background-color: rgb(228, 170, 228);
+  background-color: rgba(170, 215, 228, 0.648);
 }
 
 .boxtext {

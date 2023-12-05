@@ -1,3 +1,4 @@
+import { dancingDoll } from '../assets/assets';
 const GameInfo = () => {
   return (
     <div className='gameInfo'>
@@ -9,7 +10,7 @@ const GameInfo = () => {
       </div>
 
       <div className='imgBox'>
-        <img src='../../src/assets/excited.gif' alt='image' />
+        <img src={dancingDoll} alt='image' />
       </div>
     </div>
   );
