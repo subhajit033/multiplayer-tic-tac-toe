@@ -13,6 +13,10 @@ const io = new Server(server, {
 
 io.on('connection', (socket) => {
   console.log('a user connected with ' + socket.id);
+  socket.on('turn', (data) => {
+    console.log(data);
+    socket.broadcast.emit('received_turn', data);
+  });
 });
 
 app.get('/', (req, res) => {

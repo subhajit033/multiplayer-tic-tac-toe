@@ -98,8 +98,11 @@
 
 // export default PlayGame;
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { gameOverTone, ting } from '../assets/assets';
+import io from 'socket.io-client';
+
+const socket = io.connect('http://localhost:3000');
 
 const PlayGame = () => {
   const [isGameover, setIsGameover] = useState(false);
@@ -111,31 +114,44 @@ const PlayGame = () => {
   // Move checkWin outside useEffect
 
   console.log('gameturn ' + gameTurn);
-  console.log('gameover ' + isGameover);
+
+  const handleBoxClick = (box, i) => {
+    console.log('is Gameover ' + isGameover);
+    if (isGameover) {
+      return;
+    }
+    const boxText = box.querySelector('.boxtext');
+
+    if (boxText.innerHTML === '' && !isGameover) {
+      turn.currentTime = 0;
+      setGameTurn((prevTurn) => {
+        socket.emit('turn', { turn: prevTurn, index: i });
+        boxText.innerHTML = prevTurn; // Set the boxText to the current value of gameTurn
+        console.log(boxText);
+        return prevTurn === 'X' ? 'O' : 'X'; // Return the updated value
+      });
+
+      // document.querySelector('.info').innerHTML = `Turn for ${gameTurn}`;
+      turn.play();
+      setTimeout(() => {
+        checkWin();
+      }, 300);
+    }
+  };
+
   useEffect(() => {
-    const handleBoxClick = (box) => {
-      const boxText = box.querySelector('.boxtext');
-      if (boxText.innerHTML === '' && !isGameover) {
-        turn.currentTime = 0;
-        // boxText.innerHTML = gameTurn;
-        // setGameTurn((prevTurn) => (prevTurn === 'X' ? 'O' : 'X'));
-        setGameTurn((prevTurn) => {
-          boxText.innerHTML = prevTurn; // Set the boxText to the current value of gameTurn
-          console.log(boxText);
-          return prevTurn === 'X' ? 'O' : 'X'; // Return the updated value
-        });
+    socket.on('received_turn', (data) => {
+      document.getElementsByClassName('boxtext')[data.index].innerHTML =
+        data.turn;
+      checkWin();
+      setGameTurn((prevTurn) => (data.turn === 'X' ? 'O' : 'X'));
+    });
+  }, [socket]);
 
-        // document.querySelector('.info').innerHTML = `Turn for ${gameTurn}`;
-        turn.play();
-        setTimeout(() => {
-          checkWin();
-        }, 300);
-      }
-    };
-
+  useEffect(() => {
     const boxes = document.querySelectorAll('.box');
-    boxes.forEach((box) => {
-      box.addEventListener('click', () => handleBoxClick(box));
+    boxes.forEach((box, i) => {
+      box.addEventListener('click', () => handleBoxClick(box, i));
     });
 
     return () => {
@@ -148,7 +164,6 @@ const PlayGame = () => {
 
   const checkWin = () => {
     const boxText = Array.from(document.getElementsByClassName('boxtext'));
-    console.log('boxtext', boxText);
 
     let wins = [
       [0, 1, 2],
@@ -162,9 +177,6 @@ const PlayGame = () => {
     ];
 
     wins.forEach((e) => {
-      console.log('1 ' + boxText[e[0]].innerText);
-      console.log('2 ' + boxText[e[1]].innerText);
-      console.log('3 ' + boxText[e[2]].innerText);
       if (
         boxText[e[0]].innerText === boxText[e[1]].innerText &&
         boxText[e[1]].innerText === boxText[e[2]].innerText &&
@@ -173,6 +185,7 @@ const PlayGame = () => {
         boxText[e[2]].innerText !== ''
       ) {
         setIsGameover(true);
+        document.querySelector('.info').innerHTML = 'win!!';
         console.log('game wined');
         gameOver.play();
       }
@@ -189,6 +202,7 @@ const PlayGame = () => {
       boxText[7].innerText !== '' &&
       boxText[8].innerText !== ''
     ) {
+      setIsGameover(true);
       document.querySelector('.info').innerHTML = `Tie !!`;
       gameOver.play();
     }
