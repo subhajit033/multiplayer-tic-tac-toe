@@ -125,13 +125,13 @@ const PlayGame = () => {
     if (boxText.innerHTML === '' && !isGameover) {
       turn.currentTime = 0;
       setGameTurn((prevTurn) => {
+        document.querySelector('.info').innerHTML = `Turn for ${prevTurn}`;
         socket.emit('turn', { turn: prevTurn, index: i });
         boxText.innerHTML = prevTurn; // Set the boxText to the current value of gameTurn
         console.log(boxText);
         return prevTurn === 'X' ? 'O' : 'X'; // Return the updated value
       });
 
-      // document.querySelector('.info').innerHTML = `Turn for ${gameTurn}`;
       turn.play();
       setTimeout(() => {
         checkWin();
@@ -185,9 +185,12 @@ const PlayGame = () => {
         boxText[e[2]].innerText !== ''
       ) {
         setIsGameover(true);
-        document.querySelector('.info').innerHTML = 'win!!';
+        document.querySelector('.info').innerHTML = `${
+          boxText[e[0]].innerText
+        } won the game`;
         console.log('game wined');
         gameOver.play();
+        return;
       }
     });
 
