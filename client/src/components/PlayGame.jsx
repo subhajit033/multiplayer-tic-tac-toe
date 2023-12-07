@@ -102,7 +102,7 @@ import { useEffect, useState } from 'react';
 import { gameOverTone, ting } from '../assets/assets';
 import io from 'socket.io-client';
 
-const socket = io.connect('http://localhost:3000');
+const socket = io.connect('https://tic-tac-toe-fd6q.onrender.com');
 
 const PlayGame = () => {
   const [isGameover, setIsGameover] = useState(false);

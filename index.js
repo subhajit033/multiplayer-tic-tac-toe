@@ -14,7 +14,7 @@ console.log(__dirname);
 
 const io = new Server(server, {
   cors: {
-    origin: ['http://localhost:5173'],
+    origin: ['https://tic-tac-toe-fd6q.onrender.com'],
   },
 });
 
